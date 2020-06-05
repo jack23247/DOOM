@@ -22,6 +22,10 @@
 
 static const char rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 
+// CELLDOOM_HOOK
+//  Provides CD_Timing facilities
+#include "celldoom.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -64,6 +68,7 @@ byte *I_ZoneBase(int *size) {
 // I_GetTime
 // returns time in 1/70th second tics
 //
+#ifndef CELLDOOM
 int I_GetTime(void) {
   struct timeval tp;
   struct timezone tzp;
@@ -76,6 +81,20 @@ int I_GetTime(void) {
   newtics = (tp.tv_sec - basetime) * TICRATE + tp.tv_usec * TICRATE / 1000000;
   return newtics;
 }
+#else
+// CELLDOOM
+//  Patch I_GetTime() to use CD_GetSysTime() instead of getttimeofday()
+int I_GetTime(void) {
+  cd_systime st;
+  int newtics;
+  static uint64_t basetime = 0;
+  st = CD_GetSysTime();
+  if (!basetime)
+    basetime = st;
+  newtics = ((st - basetime) * TICRATE + st * TICRATE) / 1000000;
+  return newtics;
+}
+#endif
 
 //
 // I_Init
@@ -98,6 +117,11 @@ void I_Quit(void) {
 }
 
 void I_WaitVBL(int count) {
+#ifdef CELLDOOM
+  // CELLDOOM
+  //  Patch I_WaitVBL() to call CellOS usleep.
+  CD_USleep(count * (1000000 / 70));
+#else
 #ifdef SGI
   sginap(1);
 #else
@@ -105,6 +129,7 @@ void I_WaitVBL(int count) {
   sleep(0);
 #else
   usleep(count * (1000000 / 70));
+#endif
 #endif
 #endif
 }

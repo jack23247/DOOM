@@ -1,0 +1,39 @@
+
+-- CELLDOOM LOG START --
+
+CD_DoomMain: Init at 11826860.
+
+CD_FSLoadModule: Mounting. Done.
+CD_FSTestAccess: Trying /app_home/doom2f.wad      Failed. Reason: 0x80010006
+CD_FSTestAccess: Trying /app_home/doom2.wad       Failed. Reason: 0x80010006
+CD_FSTestAccess: Trying /app_home/plutonia.wad    Failed. Reason: 0x80010006
+CD_FSTestAccess: Trying /app_home/tnt.wad         Failed. Reason: 0x80010006
+CD_FSTestAccess: Trying /app_home/doomu.wad       Failed. Reason: 0x80010006
+CD_FSTestAccess: Trying /app_home/doom.wad        Succeded!
+
+                            DOOM Registered Startup v1.10
+V_Init: allocate screens.
+M_LoadDefaults: Load system defaults.
+Z_Init: Init zone memory allocation daemon.
+W_Init: Init WADfiles.
+ adding /app_home/doom.wad
+===========================================================================
+                 Commercial product - do not distribute!
+         Please report software piracy to the SPA: 1-800-388-PIR8
+===========================================================================
+M_Init: Init miscellaneous info.
+R_Init: Init DOOM refresh daemon - [.....
+InitTextures
+InitFlats............
+InitSprites
+InitColormaps
+R_InitData
+R_InitPointToAngle
+R_InitTables
+R_InitPlanes
+R_InitLightTables
+R_InitSkyMap
+R_InitTranslationsTables
+P_Init: Init Playloop state.
+I_Init: Setting up machine state.
+D_CheckNetGame: Checking network game status.

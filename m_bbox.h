@@ -22,7 +22,13 @@
 #ifndef __M_BBOX__
 #define __M_BBOX__
 
+// CELLDOOM
+//  Not using CELLDOOM as it's pointless to include an useless header
+#ifndef __PS3__
 #include <values.h>
+#else
+#include "doomtype.h"
+#endif
 
 #include "m_fixed.h"
 

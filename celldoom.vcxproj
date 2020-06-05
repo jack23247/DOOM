@@ -51,6 +51,9 @@
       <PreprocessorDefinitions>_DEBUG;__CELL_ASSERT__;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>-lfs_stub;-lsysmodule_stub;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|PS3'">
     <ClCompile>
@@ -60,6 +63,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="am_map.h" />
+    <ClInclude Include="celldoom.h" />
     <ClInclude Include="doomdata.h" />
     <ClInclude Include="doomdef.h" />
     <ClInclude Include="doomstat.h" />
@@ -124,6 +128,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="am_map.c" />
+    <ClCompile Include="celldoom.c" />
     <ClCompile Include="doomdef.c" />
     <ClCompile Include="doomstat.c" />
     <ClCompile Include="dstrings.c" />

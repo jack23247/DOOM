@@ -23,6 +23,8 @@
 #ifndef __DOOMTYPE__
 #define __DOOMTYPE__
 
+#ifndef CELLDOOM
+
 #ifndef __BYTEBOOL__
 #define __BYTEBOOL__
 // Fixed to use builtin bool type with C++.
@@ -50,6 +52,44 @@ typedef unsigned char byte;
 // Max negative 32-bit integer.
 #define MININT ((int)0x80000000)
 #define MINLONG ((long)0x80000000)
+#endif
+
+#else
+
+// CELLDOOM
+//  Use headers and limits provided by the SDK
+
+#ifndef __BYTEBOOL__
+#define __BYTEBOOL__
+
+#ifdef __cplusplus
+#include <stdbool.h>
+typedef bool boolean;
+#else
+typedef enum { false, true } boolean;
+#endif
+
+// This comes from Chocolate DOOM. It's clever!
+#include <inttypes.h>
+
+typedef uint8_t byte;
+typedef uint8_t pixel_t;
+typedef int16_t dpixel_t;
+
+#endif // __BYTEBOOL__
+
+#include <limits.h>
+
+#define MAXCHAR CHAR_MAX
+#define MAXSHORT SHRT_MAX
+#define MAXINT INT_MAX
+#define MAXLONG LONG_MAX
+
+#define MINCHAR CHAR_MIN
+#define MINSHORT SHRT_MIN
+#define MININT INT_MIN
+#define MINLONG LONG_MIN
+
 #endif
 
 #endif

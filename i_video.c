@@ -23,30 +23,20 @@
 
 static const char rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 
+// CELLDOOM_HOOK
+#include "celldoom.h"
+
 #include <stdlib.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
 #include <unistd.h>
-
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <X11/keysym.h>
-
-#include <X11/extensions/XShm.h>
-// Had to dig up XShm.c for this one.
-// It is in the libXext, but not in the XFree86 headers.
-#ifdef LINUX
-int XShmGetEventBase(Display *dpy); // problems with g++?
-#endif
 
 #include <stdarg.h>
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <sys/types.h>
 
-#include <errnos.h>
+//#include <errnos.h>
 #include <netinet/in.h>
-#include <signal.h>
+//#include <signal.h>
 
 #include "d_main.h"
 #include "doomstat.h"
@@ -58,6 +48,7 @@ int XShmGetEventBase(Display *dpy); // problems with g++?
 
 #define POINTER_WARP_COUNTDOWN 1
 
+#ifndef CELLDOOM
 Display *X_display = 0;
 Window X_mainWindow;
 Colormap X_cmap;
@@ -81,6 +72,7 @@ int X_shmeventtype;
 // Needs an invisible mouse cursor at least.
 boolean grabMouse;
 int doPointerWarp = POINTER_WARP_COUNTDOWN;
+#endif
 
 // Blocky mode,
 // replace each 320x200 pixel with multiply*multiply pixels.
@@ -95,7 +87,7 @@ static int multiply = 1;
 int xlatekey(void) {
 
   int rc;
-
+#ifndef CELLDOOM
   switch (rc = XKeycodeToKeysym(X_display, X_event.xkey.keycode, 0)) {
   case XK_Left:
     rc = KEY_LEFTARROW;
@@ -198,11 +190,12 @@ int xlatekey(void) {
       rc = rc - 'A' + 'a';
     break;
   }
-
+#endif
   return rc;
 }
 
 void I_ShutdownGraphics(void) {
+#ifndef CELLDOOM
   // Detach from X server
   if (!XShmDetach(X_display, &X_shminfo))
     I_Error("XShmDetach() failed in I_ShutdownGraphics()");
@@ -213,6 +206,7 @@ void I_ShutdownGraphics(void) {
 
   // Paranoia.
   image->data = NULL;
+#endif
 }
 
 //
@@ -228,7 +222,7 @@ boolean mousemoved = false;
 boolean shmFinished;
 
 void I_GetEvent(void) {
-
+#ifndef CELLDOOM
   event_t event;
 
   // put event-grabbing stuff in here
@@ -302,8 +296,10 @@ void I_GetEvent(void) {
       shmFinished = true;
     break;
   }
+#endif
 }
 
+#ifndef CELLDOOM
 Cursor createnullcursor(Display *display, Window root) {
   Pixmap cursormask;
   XGCValues xgc;
@@ -324,12 +320,13 @@ Cursor createnullcursor(Display *display, Window root) {
   XFreeGC(display, gc);
   return cursor;
 }
+#endif
 
 //
 // I_StartTic
 //
 void I_StartTic(void) {
-
+#ifndef CELLDOOM
   if (!X_display)
     return;
 
@@ -349,6 +346,7 @@ void I_StartTic(void) {
   }
 
   mousemoved = false;
+#endif
 }
 
 //
@@ -362,7 +360,7 @@ void I_UpdateNoBlit(void) {
 // I_FinishUpdate
 //
 void I_FinishUpdate(void) {
-
+#ifndef CELLDOOM
   static int lasttic;
   int tics;
   int i;
@@ -499,6 +497,7 @@ void I_FinishUpdate(void) {
     // sync up with server
     XSync(X_display, False);
   }
+#endif
 }
 
 //
@@ -508,6 +507,7 @@ void I_ReadScreen(byte *scr) {
   memcpy(scr, screens[0], SCREENWIDTH * SCREENHEIGHT);
 }
 
+#ifndef CELLDOOM
 //
 // Palette stuff.
 //
@@ -548,12 +548,18 @@ void UploadNewPalette(Colormap cmap, byte *palette) {
     XStoreColors(X_display, cmap, colors, 256);
   }
 }
+#endif
 
 //
 // I_SetPalette
 //
-void I_SetPalette(byte *palette) { UploadNewPalette(X_cmap, palette); }
+void I_SetPalette(byte *palette) {
+#ifndef CELLDOOM
+  UploadNewPalette(X_cmap, palette);
+#endif
+}
 
+#ifndef CELLDOOM
 //
 // This function is probably redundant,
 //  if XShmDetach works properly.
@@ -638,6 +644,7 @@ void grabsharedmemory(int size) {
 
   fprintf(stderr, "shared memory id=%d, addr=0x%x\n", id, (int)(image->data));
 }
+#endif
 
 void I_InitGraphics(void) {
 
@@ -654,17 +661,19 @@ void I_InitGraphics(void) {
 
   int oktodraw;
   unsigned long attribmask;
+#ifndef CELLDOOM
   XSetWindowAttributes attribs;
   XGCValues xgcvalues;
+#endif
   int valuemask;
   static int firsttime = 1;
 
   if (!firsttime)
     return;
   firsttime = 0;
-
+#ifndef CELLDOOM
   signal(SIGINT, (void (*)(int))I_Quit);
-
+#endif
   if (M_CheckParm("-2"))
     multiply = 2;
 
@@ -673,19 +682,19 @@ void I_InitGraphics(void) {
 
   if (M_CheckParm("-4"))
     multiply = 4;
-
+#ifndef CELLDOOM
   X_width = SCREENWIDTH * multiply;
   X_height = SCREENHEIGHT * multiply;
-
+#endif
   // check for command-line display name
   if ((pnum = M_CheckParm("-disp"))) // suggest parentheses around assignment
     displayname = myargv[pnum + 1];
   else
     displayname = 0;
-
+#ifndef CELLDOOM
   // check if the user wants to grab the mouse (quite unnice)
   grabMouse = !!M_CheckParm("-grabmouse");
-
+#endif
   // check for command-line geometry
   if ((pnum = M_CheckParm("-geom"))) // suggest parentheses around assignment
   {
@@ -702,7 +711,7 @@ void I_InitGraphics(void) {
     } else
       I_Error("bad -geom parameter");
   }
-
+#ifndef CELLDOOM
   // open the display
   X_display = XOpenDisplay(displayname);
   if (!X_display) {
@@ -828,6 +837,7 @@ void I_InitGraphics(void) {
     screens[0] = (unsigned char *)(image->data);
   else
     screens[0] = (unsigned char *)malloc(SCREENWIDTH * SCREENHEIGHT);
+#endif
 }
 
 unsigned exptable[256];

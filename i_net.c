@@ -22,6 +22,9 @@
 
 static const char rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 
+// CELLDOOM_HOOK
+#include "celldoom.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,7 +33,9 @@ static const char rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 #include <errno.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#ifndef CELLDOOM
 #include <sys/ioctl.h>
+#endif
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -46,6 +51,7 @@ static const char rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 #endif
 #include "i_net.h"
 
+#ifndef CELLDOOM
 // For some odd reason...
 #define ntohl(x)                                                               \
   ((unsigned long int)((((unsigned long int)(x)&0x000000ffU) << 24) |          \
@@ -59,6 +65,7 @@ static const char rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 
 #define htonl(x) ntohl(x)
 #define htons(x) ntohs(x)
+#endif
 
 void NetSend(void);
 boolean NetListen(void);
@@ -67,7 +74,9 @@ boolean NetListen(void);
 // NETWORKING
 //
 
+#ifndef CELLDOOM
 int DOOMPORT = (IPPORT_USERRESERVED + 0x1d);
+#endif
 
 int sendsocket;
 int insocket;
@@ -82,12 +91,13 @@ void (*netsend)(void);
 //
 int UDPsocket(void) {
   int s;
-
+  
+#ifndef CELLDOOM
   // allocate a socket
   s = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
   if (s < 0)
     I_Error("can't create socket: %s", strerror(errno));
-
+#endif
   return s;
 }
 
@@ -95,6 +105,7 @@ int UDPsocket(void) {
 // BindToLocalPort
 //
 void BindToLocalPort(int s, int port) {
+  #ifndef CELLDOOM
   int v;
   struct sockaddr_in address;
 
@@ -106,12 +117,14 @@ void BindToLocalPort(int s, int port) {
   v = bind(s, (void *)&address, sizeof(address));
   if (v == -1)
     I_Error("BindToPort: bind: %s", strerror(errno));
+#endif
 }
 
 //
 // PacketSend
 //
 void PacketSend(void) {
+  #ifndef CELLDOOM
   int c;
   doomdata_t sw;
 
@@ -137,12 +150,15 @@ void PacketSend(void) {
 
   //	if (c == -1)
   //		I_Error ("SendPacket error: %s",strerror(errno));
+#endif
 }
 
 //
 // PacketGet
 //
 void PacketGet(void) {
+  
+#ifndef CELLDOOM
   int i;
   int c;
   struct sockaddr_in fromaddress;
@@ -195,9 +211,12 @@ void PacketGet(void) {
     netbuffer->cmds[c].chatchar = sw.cmds[c].chatchar;
     netbuffer->cmds[c].buttons = sw.cmds[c].buttons;
   }
+#endif
 }
 
 int GetLocalAddress(void) {
+  
+#ifndef CELLDOOM
   char hostname[1024];
   struct hostent *hostentry; // host information entry
   int v;
@@ -212,12 +231,17 @@ int GetLocalAddress(void) {
     I_Error("GetLocalAddress : gethostbyname: couldn't get local host");
 
   return *(int *)hostentry->h_addr_list[0];
+#else
+  return -1;
+#endif
 }
 
 //
 // I_InitNetwork
 //
 void I_InitNetwork(void) {
+  
+#ifndef CELLDOOM
   boolean trueval = true;
   int i;
   int p;
@@ -295,13 +319,17 @@ void I_InitNetwork(void) {
   ioctl(insocket, FIONBIO, &trueval);
 
   sendsocket = UDPsocket();
+#endif
 }
 
 void I_NetCmd(void) {
+  
+#ifndef CELLDOOM
   if (doomcom->command == CMD_SEND) {
     netsend();
   } else if (doomcom->command == CMD_GET) {
     netget();
   } else
     I_Error("Bad net cmd: %i\n", doomcom->command);
+#endif
 }

@@ -23,11 +23,17 @@
 
 static const char rcsid[] = "$Id: w_wad.c,v 1.5 1997/02/03 16:47:57 b1 Exp $";
 
+// CELLDOOM_HOOK
+//  Provides CD_PosixCompat miscellanea
+#include "celldoom.h"
+
 #ifdef NORMALUNIX
 #include <alloca.h>
 #include <ctype.h>
 #include <fcntl.h>
+#ifndef CELLDOOM
 #include <malloc.h>
+#endif
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>

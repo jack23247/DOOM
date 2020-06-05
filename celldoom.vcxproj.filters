@@ -74,12 +74,6 @@
     <ClInclude Include="hu_stuff.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="i_net.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="i_sound.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="i_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -197,6 +191,15 @@
     <ClInclude Include="z_zone.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="celldoom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="i_sound.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="i_net.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="am_map.c">
@@ -236,12 +239,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="i_main.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="i_net.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="i_sound.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="i_system.c">
@@ -383,6 +380,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="z_zone.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="celldoom.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="i_net.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="i_sound.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

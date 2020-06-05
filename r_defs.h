@@ -369,7 +369,14 @@ typedef struct {
   // If false use 0 for any position.
   // Note: as eight entries are available,
   //  we might as well insert the same name eight times.
+  // CELLDOOM
+  //  This value was a boolean but as both 0 and 1 trigger errors in
+  //  R_InstallSpriteLump it makes more sense if we use a byte.
+#ifndef __cplusplus
   boolean rotate;
+#else
+  byte rotate;
+#endif
 
   // Lump to use for view angles 0-7.
   short lump[8];

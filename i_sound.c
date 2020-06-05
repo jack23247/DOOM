@@ -23,6 +23,9 @@
 
 static const char rcsid[] = "$Id: i_unix.c,v 1.5 1997/02/03 22:45:10 b1 Exp $";
 
+// CELLDOOM_HOOK
+#include "celldoom.h"
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,19 +35,25 @@ static const char rcsid[] = "$Id: i_unix.c,v 1.5 1997/02/03 22:45:10 b1 Exp $";
 #include <sys/time.h>
 #include <sys/types.h>
 
+#ifndef CELLDOOM
 #ifndef LINUX
 #include <sys/filio.h>
 #endif
+#endif
 
 #include <fcntl.h>
+#ifndef CELLDOOM
 #include <sys/ioctl.h>
+#endif
 #include <unistd.h>
 
+#ifndef CELLDOOM
 // Linux voxware output.
 #include <linux/soundcard.h>
 
 // Timer stuff. Experimental.
 #include <signal.h>
+#endif
 #include <time.h>
 
 #include "z_zone.h"
@@ -144,6 +153,7 @@ int vol_lookup[128 * 256];
 int *channelleftvol_lookup[NUM_CHANNELS];
 int *channelrightvol_lookup[NUM_CHANNELS];
 
+#ifndef CELLDOOM
 //
 // Safe ioctl, convenience.
 //
@@ -158,6 +168,7 @@ void myioctl(int fd, int command, int *arg) {
     exit(-1);
   }
 }
+#endif
 
 //
 // This function loads the sound data from the WAD lump,
@@ -633,6 +644,7 @@ void I_ShutdownSound(void) {
 }
 
 void I_InitSound() {
+#ifndef CELLDOOM
 #ifdef SNDSERV
   char buffer[256];
 
@@ -708,6 +720,7 @@ void I_InitSound() {
   fprintf(stderr, "I_InitSound: sound module ready\n");
 
 #endif
+#endif
 }
 
 //
@@ -778,6 +791,7 @@ typedef sigset_t tSigSet;
 typedef int tSigSet;
 #endif
 
+#ifndef CELLDOOM
 // We might use SIGVTALRM and ITIMER_VIRTUAL, if the process
 //  time independend timer happens to get lost due to heavy load.
 // SIGALRM and ITIMER_REAL doesn't really work well.
@@ -785,6 +799,7 @@ typedef int tSigSet;
 static int /*__itimer_which*/ itimer = ITIMER_REAL;
 
 static int sig = SIGALRM;
+#endif
 
 // Interrupt handler.
 void I_HandleSoundTimer(int ignore) {
@@ -809,6 +824,7 @@ void I_HandleSoundTimer(int ignore) {
 
 // Get the interrupt. Set duration in millisecs.
 int I_SoundSetTimer(int duration_of_tick) {
+#ifndef CELLDOOM
   // Needed for gametick clockwork.
   struct itimerval value;
   struct itimerval ovalue;
@@ -842,6 +858,9 @@ int I_SoundSetTimer(int duration_of_tick) {
     fprintf(stderr, "I_SoundSetTimer: interrupt n.a.\n");
 
   return res;
+#else
+  return -1;
+#endif
 }
 
 // Remove the interrupt. Set duration to zero.

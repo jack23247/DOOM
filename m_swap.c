@@ -29,7 +29,11 @@ static const char rcsid[] = "$Id: m_bbox.c,v 1.1 1997/02/03 22:45:10 b1 Exp $";
 #include "m_swap.h"
 
 // Not needed with big endian.
-#ifndef __BIG_ENDIAN__
+// CELLDOOM
+//  THE ABOVE STATEMENT IS FALSE. TRUTH.
+//  Big endian improvements, like, it works now... Thanks to:
+//  http://geekchef.com/more-doom-obsession-with-ubuntu-powerpc/
+#ifdef __BIG_ENDIAN__
 
 // Swap 16bit, that is, MSB and LSB byte.
 unsigned short SwapSHORT(unsigned short x) {
