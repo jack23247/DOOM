@@ -76,6 +76,8 @@ boolean NetListen(void);
 
 #ifndef CELLDOOM
 int DOOMPORT = (IPPORT_USERRESERVED + 0x1d);
+#else
+int DOOMPORT = 0;
 #endif
 
 int sendsocket;
@@ -240,8 +242,7 @@ int GetLocalAddress(void) {
 // I_InitNetwork
 //
 void I_InitNetwork(void) {
-  
-#ifndef CELLDOOM
+
   boolean trueval = true;
   int i;
   int p;
@@ -285,6 +286,8 @@ void I_InitNetwork(void) {
     return;
   }
 
+#ifndef CELLDOOM
+
   netsend = PacketSend;
   netget = PacketGet;
   netgame = true;
@@ -319,6 +322,10 @@ void I_InitNetwork(void) {
   ioctl(insocket, FIONBIO, &trueval);
 
   sendsocket = UDPsocket();
+#else
+  printf("-- CELLDOOM TRAP --\n"
+         "I_InitNetwork(): -net parameter is not supported at the moment.");
+  exit(-1);
 #endif
 }
 

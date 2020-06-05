@@ -30,7 +30,16 @@
 // Global parameters/defines.
 //
 // DOOM version
-enum { VERSION = 110 };
+// CELLDOOM
+//  Looks like we need to set version to 109 to use "normal" WADs or else 
+//  we'll likely hit a "Demo is from a different game version!" error.
+enum {
+#ifndef __PS3__
+  VERSION = 110
+#else
+  VERSION = 109
+#endif
+};
 
 // Game mode handling - identify IWAD version
 //  to handle IWAD dependend animations etc.

@@ -28,8 +28,7 @@
 
 #define CELLDOOM __PS3__
 #define NORMALUNIX CELLDOOM
-#define CD_INDEV_NOSND 1
-#define CD_INDEV_NONET 1
+#define SNDSRV 1 // hack till sound is fixed (it's gonna be a lot of work)
 
 ///////////////////////////////////////////////////////////////////////////////
 // CD_PosixCompat

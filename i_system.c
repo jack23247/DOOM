@@ -87,7 +87,7 @@ int I_GetTime(void) {
 int I_GetTime(void) {
   cd_systime st;
   int newtics;
-  static uint64_t basetime = 0;
+  static cd_systime basetime = 0;
   st = CD_GetSysTime();
   if (!basetime)
     basetime = st;

@@ -594,7 +594,9 @@ void I_UpdateSound(void) {
 //
 void I_SubmitSound(void) {
   // Write it to DSP device.
+#ifndef CELLDOOM
   write(audio_fd, mixbuffer, SAMPLECOUNT * BUFMUL);
+#endif
 }
 
 void I_UpdateSoundParams(int handle, int vol, int sep, int pitch) {
