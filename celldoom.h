@@ -59,6 +59,7 @@ void CD_DoomMain();
 
 ///////////////////////////////////////////////////////////////////////////////
 // CD_Timing
+
 typedef system_time_t cd_systime;
 inline cd_systime CD_GetSysTime();
 inline void CD_USleep(unsigned long long amount);
@@ -76,6 +77,31 @@ int CD_FSTestAccess(const char *fname, CellFsStat *status);
 
 ///////////////////////////////////////////////////////////////////////////////
 // CD_Video
+
+void CD_VideoLoadModule();
+void CD_VideoInit();
+
+///////////////////////////////////////////////////////////////////////////////
+// CD_PSGL
+
+void CD_PSGLInit();
+void CD_PSGLDestroy();
+
+typedef struct devinfo_t {
+  GLuint width;
+  GLuint height;
+  GLfloat aspectRatio;
+  GLenum colorFormat;
+  GLenum depthFormat;
+  GLenum multisamplingMode;
+} devinfo_t;
+
+PSGLinitOptions CD_PSGLOptions;
+
+devinfo_t CD_PSGLDeviceInfo;
+PSGLdevice* CD_PSGLDevice;
+
+PSGLcontext* CD_PSGLMainContext;
 
 ///////////////////////////////////////////////////////////////////////////////
 // CD_Audio

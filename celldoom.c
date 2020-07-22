@@ -49,10 +49,12 @@ int access(const char *pathname, int mode) {
 void CD_DoomMain() {
   printf("\n-- CELLDOOM LOG START --\n\nCD_DoomMain: Init at %d.\n\n",
          sys_time_get_system_time());
-  printf("CD_DoomMain: Loading CellOS FileSystem module...\n");
+  printf("CD_DoomMain: Loading CellOS filesystem module...\n");
   CD_FSLoadModule();
+  printf("CD_DoomMain: Loading CellOS video module...\n");
+  CD_VideoLoadModule();
   printf("CD_DoomMain: Initializing video...\n");
-  //CD_VideoInit();
+  CD_VideoInit();
   return;
 };
 
@@ -110,64 +112,88 @@ int CD_FSTestAccess(const char *fname, CellFsStat *status) {
 ///////////////////////////////////////////////////////////////////////////////
 // CD_Video
 
+void CD_VideoLoadModule() {
+  int ret = cellSysmoduleLoadModule(CELL_SYSMODULE_GCM_SYS);
+  if (ret) {
+    printf("-- CELLDOOM TRAP --\n"
+           "CD_VideoLoadModule: Unable to load module. Reason: 0x%x\n",
+           ret);
+    exit(-1);
+  }
+  return;
+}
+
 void CD_VideoInit() {
-
-  // Initialize an SPU that will be assigned to PSGL exclusively to aid with
-  // memory transfers.
-  //sys_spu_initialize(6, 1);
-
-  CellVideoOutState video_state;
-
   // Wait for video device to become ready (HDMI only!).
+  CellVideoOutState videoState;
+  CellVideoOutResolution resolution;
   printf("CD_VideoInit: Waiting for video device");
   do {
     printf(".");
     sys_timer_sleep(1);
-    cellVideoOutGetState(CELL_VIDEO_OUT_PRIMARY, 0, &video_state);
-  } while (video_state.state != CELL_VIDEO_OUT_OUTPUT_STATE_ENABLED);
-  printf(". Done.\n");
-
-  // Does not work (y tho?)
-  PSGLdevice *device = psglCreateDeviceAuto(GL_ARGB_SCE, GL_NONE, GL_MULTISAMPLING_NONE_SCE);
-
-  // (5) create context
-  PSGLcontext *context = psglCreateContext();
-  psglMakeCurrent(context, device);
-  psglResetCurrentContext();
-
-  // Init PSGL and draw
-  CD_PSGLInit(device);
-
-  // Destroy the context, then the device (before psglExit)
-  psglDestroyContext(context);
-  psglDestroyDevice(device);
-  psglExit();
+    cellVideoOutGetState(CELL_VIDEO_OUT_PRIMARY, 0, &videoState);
+  } while (videoState.state != CELL_VIDEO_OUT_OUTPUT_STATE_ENABLED);
+  if (cellVideoOutGetResolution(videoState.displayMode.resolutionId,
+                                &resolution) != CELL_VIDEO_OUT_SUCCEEDED) {
+    printf("-- CELLDOOM TRAP --\n"
+           "CD_VideoInit: Unable to determine resolution.\n");
+    exit(-1);
+  }
+  printf(". Done. Resolution: %dx%d\n", resolution.width, resolution.height);
 }
 
-void CD_PSGLInit(PSGLdevice *device) {
-  // get render target buffer dimensions and set viewport
-  GLuint renderWidth, renderHeight;
-  psglGetRenderBufferDimensions(device, &renderWidth, &renderHeight);
+///////////////////////////////////////////////////////////////////////////////
+// CD_PSGL
 
-  glViewport(0, 0, renderWidth, renderHeight);
+void CD_PSGLInit() {
+  // Set PSGL Options
+  CD_PSGLOptions.enable = PSGL_INIT_MAX_SPUS | PSGL_INIT_INITIALIZE_SPUS |
+                          PSGL_INIT_HOST_MEMORY_SIZE;
+  CD_PSGLOptions.maxSPUs = 1;
+  CD_PSGLOptions.initializeSPUs = false;
 
-  // get display aspect ratio (width / height) and set projection
-  // (it is important to use this value and NOT renderWidth/renderHeight since
-  // pixel ratios do not necessarily match the 16/9 or 4/3 display aspect
-  // ratios)
-  GLfloat aspectRatio = psglGetDeviceAspectRatio(device);
+  // Initialize SPUs
+  // An SPU will be assigned to PSGL in RAW mode to aid with memory transfers
+  sys_spu_initialize(6, 1);
 
-  float l = aspectRatio, r = -l, b = -1, t = 1;
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  glOrthof(l, r, b, t, 0, 1);
+  // Initialize PSGL
+  psglInit(&CD_PSGLOptions);
 
-  glClearColor(0.f, 0.f, 0.f, 1.f);
-  glDisable(GL_CULL_FACE);
+  // Create a PSGL Device
+  CD_PSGLDevice = NULL;
+  CD_PSGLDeviceInfo.colorFormat = GL_ARGB_SCE;
+  CD_PSGLDeviceInfo.depthFormat = GL_NONE;
+  CD_PSGLDeviceInfo.multisamplingMode = GL_MULTISAMPLING_NONE_SCE;
 
-  // PSGL doesn't clear the screen on startup, so let's do that here.
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-  psglSwap();
+  CD_PSGLDevice = psglCreateDeviceAuto(CD_PSGLDeviceInfo.colorFormat,
+                                       CD_PSGLDeviceInfo.depthFormat,
+                                       CD_PSGLDeviceInfo.multisamplingMode);
+
+  if (!CD_PSGLDevice) {
+    printf("-- CELLDOOM TRAP --\n"
+           "CD_PSGLInit: Unable to create PSGL device.\n");
+    exit(-1);
+  }
+
+  psglGetDeviceDimensions(CD_PSGLDevice, &CD_PSGLDeviceInfo.width,
+                          &CD_PSGLDeviceInfo.height);
+  CD_PSGLDeviceInfo.aspectRatio = psglGetDeviceAspectRatio(CD_PSGLDevice);
+
+  printf("CD_PSGLInit: PSGL device created (%dx%d).\n", CD_PSGLDeviceInfo.width,
+         CD_PSGLDeviceInfo.height);
+
+  // Create main PSGL Context
+  CD_PSGLMainContext = NULL;
+  CD_PSGLMainContext = psglCreateContext();
+  psglMakeCurrent(CD_PSGLMainContext, CD_PSGLDevice);
+  psglResetCurrentContext();
+}
+
+void CD_PSGLDestroy() {
+  // Destroy the context, then the device (before psglExit)
+  psglDestroyContext(CD_PSGLMainContext);
+  psglDestroyDevice(CD_PSGLDevice);
+  psglExit();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
