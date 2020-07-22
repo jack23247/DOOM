@@ -46,33 +46,6 @@ static const char rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 
 #include "doomdef.h"
 
-#define POINTER_WARP_COUNTDOWN 1
-
-#ifndef CELLDOOM
-Display *X_display = 0;
-Window X_mainWindow;
-Colormap X_cmap;
-Visual *X_visual;
-GC X_gc;
-XEvent X_event;
-int X_screen;
-XVisualInfo X_visualinfo;
-XImage *image;
-int X_width;
-int X_height;
-
-// MIT SHared Memory extension.
-boolean doShm;
-
-XShmSegmentInfo X_shminfo;
-int X_shmeventtype;
-
-// Fake mouse handling.
-// This cannot work properly w/o DGA.
-// Needs an invisible mouse cursor at least.
-boolean grabMouse;
-int doPointerWarp = POINTER_WARP_COUNTDOWN;
-#endif
 
 // Blocky mode,
 // replace each 320x200 pixel with multiply*multiply pixels.
@@ -83,11 +56,10 @@ static int multiply = 1;
 //
 //  Translates the key currently in X_event
 //
-
+/*
 int xlatekey(void) {
 
   int rc;
-#ifndef CELLDOOM
   switch (rc = XKeycodeToKeysym(X_display, X_event.xkey.keycode, 0)) {
   case XK_Left:
     rc = KEY_LEFTARROW;
@@ -190,9 +162,9 @@ int xlatekey(void) {
       rc = rc - 'A' + 'a';
     break;
   }
-#endif
   return rc;
 }
+*/
 
 void I_ShutdownGraphics(void) {
 #ifndef CELLDOOM
@@ -661,19 +633,13 @@ void I_InitGraphics(void) {
 
   int oktodraw;
   unsigned long attribmask;
-#ifndef CELLDOOM
-  XSetWindowAttributes attribs;
-  XGCValues xgcvalues;
-#endif
   int valuemask;
   static int firsttime = 1;
 
   if (!firsttime)
     return;
   firsttime = 0;
-#ifndef CELLDOOM
-  signal(SIGINT, (void (*)(int))I_Quit);
-#endif
+
   if (M_CheckParm("-2"))
     multiply = 2;
 

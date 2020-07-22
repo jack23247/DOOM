@@ -62,12 +62,12 @@ typedef unsigned char byte;
 #ifndef __BYTEBOOL__
 #define __BYTEBOOL__
 
-#ifdef __cplusplus
+//#ifdef __cplusplus
 #include <stdbool.h>
 typedef bool boolean;
-#else
-typedef enum { false, true } boolean;
-#endif
+//#else
+//typedef enum { false, true } boolean;
+//#endif
 
 // This comes from Chocolate DOOM. It's clever!
 #include <inttypes.h>

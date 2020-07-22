@@ -22,6 +22,9 @@
 #include <sys/process.h>
 #include <sys/time.h>
 #include <sys/timer.h>
+#include <sys/spu_initialize.h>
+#include <sysutil/sysutil_sysparam.h>
+#include <PSGL/psgl.h>
 
 ///////////////////////////////////////////////////////////////////////////////
 // CD_DevFlags

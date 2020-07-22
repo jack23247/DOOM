@@ -52,7 +52,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>-lfs_stub;-lsysmodule_stub;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>-lfs_stub;-lsysmodule_stub;-lpsgl;-lpsglu;-lpsglfx;-lgcm_cmd;-lgcm_sys_stub;-lsysutil_stub;-lresc_stub;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\usr\local\cell\target\ppu\lib\PSGL\RSX\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|PS3'">
